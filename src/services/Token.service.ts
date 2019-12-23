@@ -1,9 +1,10 @@
 import { encode, decode } from 'jwt-simple';
 import config from '@config';
-import { consoleSandbox } from '@sentry/utils';
+import { User, AuthInfo } from '@modules/Users/interfaces/User.interface';
 
 class TokenService {
   private secret: string;
+  private authInfo: AuthInfo;
   private jwtEncode: Function;
   private jwtDecode: Function;
 
@@ -13,21 +14,17 @@ class TokenService {
     this.jwtDecode = decode;
   }
 
-  public encode(userObject: object): string {
-    let expires = Date.now() / 1000 + 60 * 30;
-    let nbf = Date.now() / 1000;
+  public encode(userObject: User): string {
+    this.authInfo = {
+      userId: userObject.id,
+      nbf: Date.now() / 1000,
+      exp: Date.now() / 1000 + 60 * 30,
+    };
 
-    return this.jwtEncode(
-      {
-        user: userObject,
-        nbf: nbf,
-        exp: expires,
-      },
-      this.secret
-    );
+    return this.jwtEncode(this.authInfo, this.secret);
   }
 
-  public decode(token: string): object {
+  public decode(token: string): AuthInfo {
     return this.jwtDecode(token, this.secret);
   }
 }

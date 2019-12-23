@@ -1,4 +1,5 @@
-import AuthenticationMiddleware from '@middlewares/Authentication.middleware';
+import AuthenticationMiddleware from './middlewares/Authentication.middleware';
+import IsAdminMiddleware from './middlewares/IsAdmin.middleware';
 
 export default [
   {
@@ -23,10 +24,20 @@ export default [
     route: '/:userId',
     method: 'put',
     description: 'update user props',
-    '@middlewares': [AuthenticationMiddleware],
+    '@middlewares': [AuthenticationMiddleware, IsAdminMiddleware],
     '@controller': {
       method: 'updateInfo',
       params: ['params.userId', 'body.props'],
+    },
+  },
+  {
+    route: '/:userId',
+    method: 'delete',
+    description: 'deactivate specific user',
+    '@middlewares': [AuthenticationMiddleware, IsAdminMiddleware],
+    '@controller': {
+      method: 'deactivate',
+      params: ['params.userId'],
     },
   },
 ];

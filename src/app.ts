@@ -10,6 +10,8 @@ import middlewares from '@middlewares/index';
 import ExceptionHandler from '@middlewares/ExceptionHandler.middleware';
 import Response404 from '@middlewares/Response404.middleware';
 
+import translate from '@services/translate.service';
+
 import routes from './routes';
 
 class App {
@@ -28,7 +30,7 @@ class App {
   }
 
   public boot(): express.Application {
-    console.clear();
+    // console.clear();
     console.log(`App starting at ${config.app.url}:${config.app.port}`);
     return this.express;
   }
@@ -36,6 +38,9 @@ class App {
   private middlewares(): void {
     // The request handler must be the first middleware on the app
     this.express.use(Sentry.Handlers.requestHandler());
+
+    // default: using 'accept-language' header to guess language settings
+    this.express.use(translate.init);
 
     this.express.use(express.urlencoded({ extended: true }));
     this.express.use(express.json());

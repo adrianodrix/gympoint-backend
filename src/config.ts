@@ -4,6 +4,7 @@ import packageJson from '../package.json';
 dotenv.config();
 
 export default {
+  lang: 'pt-br',
   app: {
     secret: process.env.SECRET,
     url: process.env.APP_URL || 'http://localhost',

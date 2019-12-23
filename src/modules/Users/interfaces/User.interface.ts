@@ -11,11 +11,19 @@ export interface PasswordReset {
   expiration: string;
 }
 
+export interface AuthInfo {
+  userId: String;
+  nbf: Number;
+  exp: Number;
+}
+
 export interface User extends Document {
+  id: String;
   active: boolean;
   name: string;
   email: string;
   password: string;
+  admin: boolean;
   phone?: string;
   avatar?: string;
   birthdate?: Date;
