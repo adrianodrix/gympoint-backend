@@ -11,7 +11,7 @@ class isAdmin {
 
     if (!user.admin) {
       return res.status(406).json({
-        message: 'user does not have permission for this feature',
+        message: req.__('user.notHavePermissionForThisFeature'),
       });
     }
 

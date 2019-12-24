@@ -1,9 +1,15 @@
+import { Request, Response } from 'express';
+import * as HttpStatus from 'http-status-codes';
 import { validateOrReject, IsEmail, IsString, Length } from 'class-validator';
+
+import TokenService from '@services/Token.service';
+import Queue from '@services/Queue.service';
 
 import { ModuleResponse } from '@interfaces';
 import { ControllerMethod } from '@classes';
 import { User, Address } from '../interfaces/User.interface';
 import UserModel from '../models/User.schema';
+import UserWelcomeMail from '@modules/Users/jobs/mail/UserWelcomeMail.job';
 
 class InputValidation {
   @Length(3, 255)
@@ -27,14 +33,18 @@ class InputValidation {
 class Method extends ControllerMethod {
   private validation: InputValidation;
   private user: User;
-  private storedUser: User;
 
   public constructor() {
     super();
     this.validation = new InputValidation();
   }
 
-  public handle = async (user: User): Promise<ModuleResponse> => {
+  public handle = async (
+    req: Request,
+    res: Response,
+    user: User
+  ): Promise<ModuleResponse> => {
+    this.setParams(req, res);
     this.user = user;
 
     return this.validateInput()
@@ -52,25 +62,38 @@ class Method extends ControllerMethod {
     this.validation.avatar = this.user.avatar;
 
     await validateOrReject(this.validation).catch((errors): void => {
-      throw new this.HttpException(400, 'input validation error', errors);
+      throw new this.HttpException(
+        HttpStatus.NOT_ACCEPTABLE,
+        this.req.__('validaton.inputValidationError'),
+        errors
+      );
     });
   };
 
   private verifyIfUserExists = async (): Promise<void> => {
     return UserModel.findOne({ email: this.user.email }).then((user): void => {
       if (user) {
-        throw new this.HttpException(400, 'user already exists');
+        throw new this.HttpException(
+          HttpStatus.NOT_ACCEPTABLE,
+          this.req.__('user.alreadyExists')
+        );
       }
     });
   };
 
   private storeUser = async (): Promise<void> => {
-    const newUser = new UserModel(this.user);
-    const storedUser = await newUser.save();
-    delete storedUser.password;
+    const storedUser = await new UserModel(this.user).save();
+    const token = TokenService.encode(storedUser);
 
-    this.status = 201;
-    this.data = storedUser;
+    Queue.add(UserWelcomeMail.key, { user: storedUser });
+
+    this.status = HttpStatus.CREATED;
+    this.data = {
+      user: storedUser,
+      meta: {
+        token,
+      },
+    };
   };
 }
 

@@ -1,4 +1,5 @@
 {
+  "hello": "hello",
   "server": {
     "started": "API iniciada na porta ${port}.",
     "failOnStart": "Erro ao iniciar api: ${error}"
@@ -10,9 +11,17 @@
     "invalid": "Token inválido."
   },
   "user": {
-    "notExists": "Usuário não pôde ser encontrado"
+    "notExists": "Usuário não pôde ser encontrado",
+    "alreadyExists": "Usuário já existe no banco de dados",
+    "notAuthorizedToAccess": "Usuário não tem autorização para acesso",
+    "invalidCredentials": "Credenciais inválidas",
+    "successfullyDeactivated": "Usuário foi desativado com sucesso",
+    "notHavePermissionForThisFeature": "Usuário não tem permissão para esse recurso"
   },
   "service": {
     "unavailable": "Não foi possível se conectar ao serviço ${name}"
+  },
+  "validation": {
+    "invalidInputs": "Informações inválidas"
   }
 }

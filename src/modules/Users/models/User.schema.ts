@@ -2,9 +2,10 @@ import { Schema, model, HookNextFunction } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import gravatar from 'gravatar';
-
-import { User } from '../interfaces/User.interface';
 import bcrypt from 'bcrypt';
+
+import Config from '@config';
+import { User } from '../interfaces/User.interface';
 
 export const AddressSchema = new Schema({
   country: {
@@ -70,6 +71,9 @@ const UserSchema = new Schema(
   },
   {
     timestamps: true,
+    collation: {
+      locale: Config.locale ? Config.locale.substr(0, 2).toLowerCase() : 'en',
+    },
   }
 );
 

@@ -21,6 +21,26 @@ export default [
     },
   },
   {
+    route: '/',
+    method: 'get',
+    description: 'list all users',
+    '@middlewares': [AuthenticationMiddleware, IsAdminMiddleware],
+    '@controller': {
+      method: 'index',
+      params: [],
+    },
+  },
+  {
+    route: '/me',
+    method: 'put',
+    description: 'update user logged',
+    '@middlewares': [AuthenticationMiddleware],
+    '@controller': {
+      method: 'updateMe',
+      params: ['body.props'],
+    },
+  },
+  {
     route: '/:userId',
     method: 'put',
     description: 'update user props',

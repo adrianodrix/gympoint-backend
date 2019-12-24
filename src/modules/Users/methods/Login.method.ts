@@ -1,3 +1,5 @@
+import { Request, Response } from 'express';
+import * as HttpStatus from 'http-status-codes';
 import { validateOrReject, IsString, IsEmail } from 'class-validator';
 
 import { ModuleResponse, Credentials } from '@interfaces';
@@ -19,7 +21,12 @@ class Login extends ControllerMethod {
   private user: User;
   private credentials: Credentials;
 
-  public handle = async (credentials: Credentials): Promise<ModuleResponse> => {
+  public handle = async (
+    req: Request,
+    res: Response,
+    credentials: Credentials
+  ): Promise<ModuleResponse> => {
+    this.setParams(req, res);
     this.credentials = credentials;
 
     return this.validateInput()
@@ -32,7 +39,10 @@ class Login extends ControllerMethod {
 
   private verifyUserIsActive = (): void => {
     if (!this.user.active) {
-      throw new this.HttpException(406, "user does't authorized to access");
+      throw new this.HttpException(
+        HttpStatus.NOT_ACCEPTABLE,
+        this.req.__('user.notAuthorizedToAccess')
+      );
     }
   };
 
@@ -43,7 +53,10 @@ class Login extends ControllerMethod {
     );
 
     if (!match) {
-      throw new this.HttpException(406, 'invalid credentials');
+      throw new this.HttpException(
+        HttpStatus.NOT_ACCEPTABLE,
+        this.req.__('user.invalidCredentials')
+      );
     }
   };
 
@@ -51,7 +64,10 @@ class Login extends ControllerMethod {
     const user = await UserModel.findOne({ email: this.credentials.email });
 
     if (!user) {
-      throw new this.HttpException(406, "user does't exists");
+      throw new this.HttpException(
+        HttpStatus.NOT_ACCEPTABLE,
+        this.req.__('user.notExists')
+      );
     }
 
     this.user = user;
@@ -64,7 +80,10 @@ class Login extends ControllerMethod {
       validation.password = this.credentials.password;
       await validateOrReject(validation);
     } catch (error) {
-      throw new this.HttpException(400, 'invalid inputs');
+      throw new this.HttpException(
+        HttpStatus.NOT_ACCEPTABLE,
+        this.req.__('user.invalidInputs')
+      );
     }
   };
 
@@ -77,7 +96,6 @@ class Login extends ControllerMethod {
         token,
       },
     };
-    this.status = 200;
   };
 }
 

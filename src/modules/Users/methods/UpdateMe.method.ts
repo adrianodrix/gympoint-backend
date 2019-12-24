@@ -47,7 +47,7 @@ interface SanitizedProps {
   address?: Address;
 }
 
-class UpdateInfo extends ControllerMethod {
+class UpdateMe extends ControllerMethod {
   private userId: string;
   private newProps: User;
   private user: User;
@@ -56,12 +56,9 @@ class UpdateInfo extends ControllerMethod {
   public handle = async (
     req: Request,
     res: Response,
-    userId: string,
     newProps: User
   ): Promise<ModuleResponse> => {
     this.setParams(req, res);
-
-    this.userId = userId;
     this.newProps = newProps;
 
     return this.validateInput()
@@ -92,7 +89,11 @@ class UpdateInfo extends ControllerMethod {
   };
 
   private checkIfUserExists = async (): Promise<void> => {
-    const user: User = await UserModel.findOne({ _id: this.userId }).catch(
+    const authenticatedUser = <User>this.req.user;
+
+    const user: User = await UserModel.findOne({
+      _id: authenticatedUser.id,
+    }).catch(
       (): User => {
         throw new this.HttpException(
           HttpStatus.NOT_ACCEPTABLE,
@@ -121,8 +122,8 @@ class UpdateInfo extends ControllerMethod {
   };
 
   private updateUserProps = async (): Promise<void> => {
-    await UserModel.findOneAndUpdate(
-      { _id: this.userId },
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { _id: this.user.id },
       { $set: { ...this.sanitizedProps } },
       { new: true }
     );
@@ -131,4 +132,4 @@ class UpdateInfo extends ControllerMethod {
   };
 }
 
-export const updateInfo = new UpdateInfo();
+export const updateMe = new UpdateMe();

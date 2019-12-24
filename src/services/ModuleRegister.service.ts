@@ -1,5 +1,6 @@
 import { get } from 'lodash';
 import { Router, Request, Response } from 'express';
+import * as HttpStatus from 'http-status-codes';
 import Youch from 'youch';
 
 import { Controller, Endpoint } from '@interfaces';
@@ -41,6 +42,8 @@ class ModuleRegisterService {
     try {
       const params = this.getParams(controller.params, req);
       const { status, data } = await this.controller[controller.method].handle(
+        req,
+        res,
         ...params
       );
       return res.status(status).send(data);
@@ -50,12 +53,12 @@ class ModuleRegisterService {
       if (process.env.NODE_ENV === 'development') {
         const errors = await new Youch(err, req).toJSON();
         return res
-          .status(err.status || 500)
+          .status(err.status || HttpStatus.INTERNAL_SERVER_ERROR)
           .send({ message: err.message, data: err.data, trace: errors });
       }
 
       return res
-        .status(err.status || 500)
+        .status(err.status || HttpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: err.message, data: err.data });
     }
   }

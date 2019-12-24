@@ -1,3 +1,6 @@
+import { Request, Response } from 'express';
+import * as HttpStatus from 'http-status-codes';
+
 import { ModuleResponse } from '@interfaces';
 import { ControllerMethod } from '@classes';
 import UserModel from '../models/User.schema';
@@ -5,7 +8,12 @@ import UserModel from '../models/User.schema';
 class Deactivate extends ControllerMethod {
   private userId: string;
 
-  public handle = async (userId: string): Promise<ModuleResponse> => {
+  public handle = async (
+    req: Request,
+    res: Response,
+    userId: string
+  ): Promise<ModuleResponse> => {
+    this.setParams(req, res);
     this.userId = userId;
 
     return this.verifyIfUserExists()
@@ -17,7 +25,10 @@ class Deactivate extends ControllerMethod {
     const { userId } = this;
     const exists = await UserModel.findOne({ _id: userId });
     if (!exists) {
-      throw new this.HttpException(400, 'user does not exists');
+      throw new this.HttpException(
+        HttpStatus.NOT_ACCEPTABLE,
+        this.req.__('user.notExists')
+      );
     }
   };
 
@@ -29,8 +40,7 @@ class Deactivate extends ControllerMethod {
       { $set: { active: false } }
     );
 
-    this.status = 200;
-    this.data = { message: 'user successfully deactivated' };
+    this.data = { message: this.req.__('user.successfullyDeactivated') };
   };
 }
 

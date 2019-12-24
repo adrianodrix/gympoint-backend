@@ -4,7 +4,7 @@ import packageJson from '../package.json';
 dotenv.config();
 
 export default {
-  lang: 'pt-br',
+  locale: 'pt-br',
   app: {
     secret: process.env.SECRET,
     url: process.env.APP_URL || 'http://localhost',
@@ -38,5 +38,23 @@ export default {
       dsn:
         process.env.NODE_ENV !== 'development' ? process.env.SENTRY_DSN : null,
     },
+  },
+  mail: {
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
+    secure: process.env.MAIL_SECURE ? true : false,
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
+    },
+    default: {
+      from: process.env.MAIL_FROM
+        ? process.env.MAIL_FROM
+        : 'Equipe Gogymp <noreply@gogymp.com>',
+    },
+  },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
   },
 };

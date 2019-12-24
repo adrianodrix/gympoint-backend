@@ -1,5 +1,5 @@
 {
-  "hello": "Hello World",
+  "hello": "Hello",
   "server": {
     "started": "Gateway API started. Running on port ${port}.",
     "failOnStart": "Error during Gateway API start: ${error}"
@@ -11,9 +11,17 @@
     "invalid": "Invalid token."
   },
   "user": {
-    "notExists": "user does not exists"
+    "notExists": "user does not exists",
+    "alreadyExists": "user already exists",
+    "notAuthorizedToAccess": "user not authorized to access",
+    "invalidCredentials": "invalid credentials",
+    "successfullyDeactivated": "user successfully deactivated",
+    "notHavePermissionForThisFeature": "user does not have permission for this feature"
   },
   "service": {
     "unavailable": "The Gateway API can't reach the service ${name}"
+  },
+  "validation": {
+    "invalidInputs": "invalid inputs"
   }
 }
